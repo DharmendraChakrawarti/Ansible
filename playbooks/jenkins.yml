@@ -1,0 +1,8 @@
+---
+# Install only Jenkins on all slave nodes
+- name: Install Jenkins
+  hosts: slave_nodes
+  become: true
+  gather_facts: true
+  roles:
+    - jenkins

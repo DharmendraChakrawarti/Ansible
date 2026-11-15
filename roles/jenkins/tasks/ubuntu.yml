@@ -1,0 +1,26 @@
+---
+# Jenkins installation tasks for Ubuntu
+
+- name: (Ubuntu) Add Jenkins GPG key
+  ansible.builtin.shell: |
+    curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | \
+    tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+  args:
+    creates: /usr/share/keyrings/jenkins-keyring.asc
+
+- name: (Ubuntu) Add Jenkins APT repository
+  ansible.builtin.shell: |
+    echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+    https://pkg.jenkins.io/debian-stable binary/" | \
+    tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+  args:
+    creates: /etc/apt/sources.list.d/jenkins.list
+
+- name: (Ubuntu) Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: (Ubuntu) Install Jenkins
+  ansible.builtin.apt:
+    name: jenkins
+    state: present

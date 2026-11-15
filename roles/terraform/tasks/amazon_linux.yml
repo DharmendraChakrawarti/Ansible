@@ -1,0 +1,19 @@
+---
+# Terraform installation tasks for Amazon Linux
+
+- name: (Amazon) Install yum-config-manager
+  ansible.builtin.yum:
+    name: yum-utils
+    state: present
+
+- name: (Amazon) Add HashiCorp repository
+  ansible.builtin.command: >
+    yum-config-manager --add-repo
+    https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+  args:
+    creates: /etc/yum.repos.d/hashicorp.repo
+
+- name: (Amazon) Install Terraform
+  ansible.builtin.yum:
+    name: terraform
+    state: present

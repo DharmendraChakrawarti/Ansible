@@ -1,0 +1,8 @@
+---
+# Install only Terraform on all slave nodes
+- name: Install Terraform
+  hosts: slave_nodes
+  become: true
+  gather_facts: true
+  roles:
+    - terraform

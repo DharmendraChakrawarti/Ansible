@@ -1,0 +1,18 @@
+---
+# Jenkins installation tasks for RedHat / CentOS / RHEL
+
+- name: (RedHat) Add Jenkins repository
+  ansible.builtin.get_url:
+    url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+    dest: /etc/yum.repos.d/jenkins.repo
+    mode: "0644"
+
+- name: (RedHat) Import Jenkins GPG key
+  ansible.builtin.rpm_key:
+    key: https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+    state: present
+
+- name: (RedHat) Install Jenkins
+  ansible.builtin.dnf:
+    name: jenkins
+    state: present

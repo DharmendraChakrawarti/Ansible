@@ -1,0 +1,75 @@
+---
+# AWS CLI v2 Role - Main Task Entry Point
+# AWS CLI v2 uses the same binary installer on all Linux distros
+
+- name: Display target OS info
+  ansible.builtin.debug:
+    msg: "Installing AWS CLI v2 on {{ ansible_distribution }} {{ ansible_distribution_version }}"
+
+- name: Install prerequisite packages (Debian-based)
+  ansible.builtin.apt:
+    name:
+      - curl
+      - unzip
+    state: present
+    update_cache: true
+  when: ansible_os_family == "Debian"
+
+- name: Install prerequisite packages (RedHat-based)
+  ansible.builtin.yum:
+    name:
+      - curl
+      - unzip
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Check if AWS CLI is already installed
+  ansible.builtin.command: aws --version
+  register: aws_cli_check
+  changed_when: false
+  ignore_errors: true
+
+- name: Determine system architecture
+  ansible.builtin.set_fact:
+    aws_arch: "{{ 'aarch64' if ansible_architecture == 'aarch64' else 'x86_64' }}"
+
+- name: Download AWS CLI v2 installer
+  ansible.builtin.get_url:
+    url: "https://awscli.amazonaws.com/awscli-exe-linux-{{ aws_arch }}.zip"
+    dest: /tmp/awscliv2.zip
+    mode: "0644"
+  when: aws_cli_check is failed
+
+- name: Unzip AWS CLI v2 installer
+  ansible.builtin.unarchive:
+    src: /tmp/awscliv2.zip
+    dest: /tmp/
+    remote_src: true
+  when: aws_cli_check is failed
+
+- name: Install AWS CLI v2
+  ansible.builtin.command: /tmp/aws/install
+  args:
+    creates: /usr/local/bin/aws
+  when: aws_cli_check is failed
+
+- name: Update existing AWS CLI v2
+  ansible.builtin.command: /tmp/aws/install --update
+  when: aws_cli_check is succeeded and awscli_force_update | default(false)
+
+- name: Clean up AWS CLI installer files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /tmp/awscliv2.zip
+    - /tmp/aws
+
+- name: Verify AWS CLI installation
+  ansible.builtin.command: aws --version
+  register: aws_version_output
+  changed_when: false
+
+- name: Show AWS CLI version
+  ansible.builtin.debug:
+    msg: "{{ aws_version_output.stdout }}"

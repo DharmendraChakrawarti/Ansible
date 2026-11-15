@@ -1,0 +1,27 @@
+---
+# Terraform Role - Main Task Entry Point
+
+- name: Display target OS info
+  ansible.builtin.debug:
+    msg: "Installing Terraform {{ terraform_version }} on {{ ansible_distribution }} {{ ansible_distribution_version }}"
+
+- name: Include Ubuntu-specific Terraform tasks
+  ansible.builtin.include_tasks: ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+
+- name: Include Amazon Linux-specific Terraform tasks
+  ansible.builtin.include_tasks: amazon_linux.yml
+  when: ansible_distribution == "Amazon"
+
+- name: Include RedHat-specific Terraform tasks
+  ansible.builtin.include_tasks: redhat.yml
+  when: ansible_os_family == "RedHat" and ansible_distribution != "Amazon"
+
+- name: Verify Terraform installation
+  ansible.builtin.command: terraform version
+  register: terraform_version_output
+  changed_when: false
+
+- name: Show Terraform version
+  ansible.builtin.debug:
+    msg: "{{ terraform_version_output.stdout }}"

@@ -1,0 +1,14 @@
+---
+dependencies: []
+galaxy_info:
+  role_name: docker
+  author: DevOps Team
+  description: Install Docker CE on Ubuntu, Amazon Linux, and RedHat
+  min_ansible_version: "2.12"
+  platforms:
+    - name: Ubuntu
+      versions: [focal, jammy, noble]
+    - name: Amazon
+      versions: [2, 2023]
+    - name: EL
+      versions: [8, 9]

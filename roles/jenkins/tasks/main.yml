@@ -1,0 +1,44 @@
+---
+# Jenkins Role - Main Task Entry Point
+
+- name: Display target OS info
+  ansible.builtin.debug:
+    msg: "Installing Jenkins on {{ ansible_distribution }} {{ ansible_distribution_version }}"
+
+- name: Install Java (required for Jenkins)
+  ansible.builtin.include_tasks: install_java.yml
+
+- name: Include Ubuntu-specific Jenkins tasks
+  ansible.builtin.include_tasks: ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+
+- name: Include Amazon Linux-specific Jenkins tasks
+  ansible.builtin.include_tasks: amazon_linux.yml
+  when: ansible_distribution == "Amazon"
+
+- name: Include RedHat-specific Jenkins tasks
+  ansible.builtin.include_tasks: redhat.yml
+  when: ansible_os_family == "RedHat" and ansible_distribution != "Amazon"
+
+- name: Start and enable Jenkins service
+  ansible.builtin.systemd:
+    name: jenkins
+    state: started
+    enabled: true
+
+- name: Wait for Jenkins to start (port {{ jenkins_http_port }})
+  ansible.builtin.wait_for:
+    port: "{{ jenkins_http_port }}"
+    delay: 10
+    timeout: 120
+
+- name: Get Jenkins initial admin password
+  ansible.builtin.command: cat /var/lib/jenkins/secrets/initialAdminPassword
+  register: jenkins_initial_password
+  changed_when: false
+  ignore_errors: true
+
+- name: Display Jenkins initial admin password
+  ansible.builtin.debug:
+    msg: "Jenkins Initial Admin Password: {{ jenkins_initial_password.stdout | default('Password file not found yet') }}"
+  when: jenkins_initial_password is succeeded

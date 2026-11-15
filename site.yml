@@ -1,0 +1,14 @@
+---
+# ──────────────────────────────────────────────
+# Master Playbook: Install ALL tools on all slave nodes
+# ──────────────────────────────────────────────
+- name: Install DevOps Tools on All Slave Nodes
+  hosts: slave_nodes
+  become: true
+  gather_facts: true
+
+  roles:
+    - docker
+    - jenkins
+    - awscli
+    - terraform

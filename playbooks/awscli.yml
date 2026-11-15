@@ -1,0 +1,8 @@
+---
+# Install only AWS CLI on all slave nodes
+- name: Install AWS CLI
+  hosts: slave_nodes
+  become: true
+  gather_facts: true
+  roles:
+    - awscli

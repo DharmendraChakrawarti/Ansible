@@ -1,0 +1,4 @@
+---
+- name: Restart AWS CLI related services
+  ansible.builtin.debug:
+    msg: "AWS CLI does not require a service restart"

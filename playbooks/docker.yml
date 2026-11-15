@@ -1,0 +1,8 @@
+---
+# Install only Docker on all slave nodes
+- name: Install Docker
+  hosts: slave_nodes
+  become: true
+  gather_facts: true
+  roles:
+    - docker

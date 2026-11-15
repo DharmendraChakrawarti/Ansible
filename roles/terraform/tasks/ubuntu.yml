@@ -1,0 +1,35 @@
+---
+# Terraform installation tasks for Ubuntu
+
+- name: (Ubuntu) Install prerequisite packages
+  ansible.builtin.apt:
+    name:
+      - gnupg
+      - software-properties-common
+      - curl
+    state: present
+    update_cache: true
+
+- name: (Ubuntu) Add HashiCorp GPG key
+  ansible.builtin.shell: |
+    curl -fsSL https://apt.releases.hashicorp.com/gpg | \
+    gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg --yes
+  args:
+    creates: /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+- name: (Ubuntu) Add HashiCorp APT repository
+  ansible.builtin.shell: |
+    echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] \
+    https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
+    tee /etc/apt/sources.list.d/hashicorp.list > /dev/null
+  args:
+    creates: /etc/apt/sources.list.d/hashicorp.list
+
+- name: (Ubuntu) Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: (Ubuntu) Install Terraform
+  ansible.builtin.apt:
+    name: terraform
+    state: present

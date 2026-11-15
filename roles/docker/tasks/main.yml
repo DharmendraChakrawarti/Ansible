@@ -1,0 +1,49 @@
+---
+# Docker Role - Main Task Entry Point
+# Routes to OS-specific task files based on distribution
+
+- name: Display target OS info
+  ansible.builtin.debug:
+    msg: "Installing Docker on {{ ansible_distribution }} {{ ansible_distribution_version }} ({{ ansible_os_family }})"
+
+- name: Include Ubuntu-specific Docker tasks
+  ansible.builtin.include_tasks: ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+
+- name: Include Amazon Linux-specific Docker tasks
+  ansible.builtin.include_tasks: amazon_linux.yml
+  when: ansible_distribution == "Amazon"
+
+- name: Include RedHat-specific Docker tasks
+  ansible.builtin.include_tasks: redhat.yml
+  when: ansible_os_family == "RedHat" and ansible_distribution != "Amazon"
+
+- name: Start and enable Docker service
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Add ansible user to docker group
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: true
+
+- name: Install Docker Compose plugin
+  ansible.builtin.shell: |
+    curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-$(uname -m)" \
+      -o /usr/local/bin/docker-compose
+    chmod +x /usr/local/bin/docker-compose
+  args:
+    creates: /usr/local/bin/docker-compose
+  when: docker_compose_install | default(true)
+
+- name: Verify Docker installation
+  ansible.builtin.command: docker --version
+  register: docker_version_output
+  changed_when: false
+
+- name: Show Docker version
+  ansible.builtin.debug:
+    msg: "{{ docker_version_output.stdout }}"

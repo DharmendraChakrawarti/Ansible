@@ -1,0 +1,54 @@
+---
+# Docker installation tasks for Ubuntu
+
+- name: (Ubuntu) Remove old Docker packages
+  ansible.builtin.apt:
+    name:
+      - docker
+      - docker-engine
+      - docker.io
+      - containerd
+      - runc
+    state: absent
+
+- name: (Ubuntu) Install prerequisite packages
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+      - software-properties-common
+    state: present
+    update_cache: true
+
+- name: (Ubuntu) Add Docker GPG key
+  ansible.builtin.shell: |
+    install -m 0755 -d /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg --yes
+    chmod a+r /etc/apt/keyrings/docker.gpg
+  args:
+    creates: /etc/apt/keyrings/docker.gpg
+
+- name: (Ubuntu) Add Docker APT repository
+  ansible.builtin.shell: |
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+    https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | \
+    tee /etc/apt/sources.list.d/docker.list > /dev/null
+  args:
+    creates: /etc/apt/sources.list.d/docker.list
+
+- name: (Ubuntu) Update apt cache after adding Docker repo
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: (Ubuntu) Install Docker CE
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present

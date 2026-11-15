@@ -1,0 +1,21 @@
+---
+# ──────────────────────────────────────────────
+# Global Variables (apply to all hosts)
+# ──────────────────────────────────────────────
+
+# SSH user for connecting to nodes
+ansible_user: ansible
+ansible_ssh_private_key_file: ~/.ssh/id_rsa
+
+# Terraform version to install
+terraform_version: "1.9.8"
+
+# AWS CLI version (v2)
+awscli_version: "2"
+
+# Jenkins settings
+jenkins_http_port: 8080
+
+# Docker settings
+docker_edition: "ce"
+docker_compose_install: true

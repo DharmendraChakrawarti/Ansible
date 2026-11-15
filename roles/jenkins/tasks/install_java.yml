@@ -1,0 +1,30 @@
+---
+# Install Java (prerequisite for Jenkins) - handles all OS families
+
+- name: (Ubuntu) Install OpenJDK 17
+  ansible.builtin.apt:
+    name: openjdk-17-jdk
+    state: present
+    update_cache: true
+  when: ansible_distribution == "Ubuntu"
+
+- name: (Amazon/RedHat) Install OpenJDK 17
+  ansible.builtin.yum:
+    name: java-17-amazon-corretto-devel
+    state: present
+  when: ansible_distribution == "Amazon"
+
+- name: (RedHat) Install OpenJDK 17
+  ansible.builtin.dnf:
+    name: java-17-openjdk-devel
+    state: present
+  when: ansible_os_family == "RedHat" and ansible_distribution != "Amazon"
+
+- name: Verify Java installation
+  ansible.builtin.command: java -version
+  register: java_version_output
+  changed_when: false
+
+- name: Show Java version
+  ansible.builtin.debug:
+    msg: "{{ java_version_output.stderr }}"

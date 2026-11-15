@@ -1,0 +1,18 @@
+---
+# Jenkins installation tasks for Amazon Linux
+
+- name: (Amazon) Add Jenkins repository
+  ansible.builtin.get_url:
+    url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+    dest: /etc/yum.repos.d/jenkins.repo
+    mode: "0644"
+
+- name: (Amazon) Import Jenkins GPG key
+  ansible.builtin.rpm_key:
+    key: https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+    state: present
+
+- name: (Amazon) Install Jenkins
+  ansible.builtin.yum:
+    name: jenkins
+    state: present

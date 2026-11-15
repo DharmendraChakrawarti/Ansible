@@ -1,0 +1,40 @@
+---
+# Docker installation tasks for RedHat / CentOS / RHEL
+
+- name: (RedHat) Remove old Docker packages
+  ansible.builtin.dnf:
+    name:
+      - docker
+      - docker-client
+      - docker-client-latest
+      - docker-common
+      - docker-latest
+      - docker-latest-logrotate
+      - docker-logrotate
+      - docker-engine
+    state: absent
+
+- name: (RedHat) Install prerequisite packages
+  ansible.builtin.dnf:
+    name:
+      - yum-utils
+      - curl
+      - unzip
+    state: present
+
+- name: (RedHat) Add Docker CE repository
+  ansible.builtin.command: >
+    yum-config-manager --add-repo
+    https://download.docker.com/linux/centos/docker-ce.repo
+  args:
+    creates: /etc/yum.repos.d/docker-ce.repo
+
+- name: (RedHat) Install Docker CE
+  ansible.builtin.dnf:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
