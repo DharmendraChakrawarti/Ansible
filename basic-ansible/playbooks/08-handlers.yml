@@ -1,0 +1,29 @@
+---
+# ==========================================
+# 08-handlers.yml - How Handlers and Notify Work
+# ==========================================
+# Handlers only run when a task makes a CHANGE (changed: true)
+# Run command:
+#   ansible-playbook playbooks/08-handlers.yml
+
+- name: Understanding Ansible Handlers
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Update sample configuration file
+      ansible.builtin.copy:
+        dest: /tmp/my-app.conf
+        content: |
+          # Application Configuration
+          port=8080
+          debug=true
+          updated_at={{ ansible_date_time.iso8601 | default('now') }}
+        mode: '0644'
+      notify: Trigger App Restart
+
+  # Handlers are only executed at the very end of the play if notified
+  handlers:
+    - name: Trigger App Restart
+      ansible.builtin.debug:
+        msg: ">> HANDLER TRIGGERED: Configuration changed, restarting application! <<"

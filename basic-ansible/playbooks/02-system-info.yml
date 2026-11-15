@@ -1,0 +1,28 @@
+---
+# ==========================================
+# 02-system-info.yml - Gather and print facts
+# ==========================================
+# Run command:
+#   ansible-playbook playbooks/02-system-info.yml
+
+- name: Gather and Display System Facts
+  hosts: all
+  gather_facts: true # Automatically discovers OS, CPU, Memory, IP, etc.
+
+  tasks:
+    - name: Display Hostname and OS
+      ansible.builtin.debug:
+        msg: >
+          Host: {{ ansible_hostname }} |
+          OS: {{ ansible_distribution }} {{ ansible_distribution_version }} |
+          Family: {{ ansible_os_family }}
+
+    - name: Display CPU and Memory Info
+      ansible.builtin.debug:
+        msg: >
+          Total CPU Cores: {{ ansible_processor_vcpus | default(ansible_processor_count) }} |
+          Total RAM: {{ ansible_memtotal_mb }} MB
+
+    - name: Display Primary IP Address
+      ansible.builtin.debug:
+        msg: "Primary IP: {{ ansible_default_ipv4.address | default('No Default IP') }}"

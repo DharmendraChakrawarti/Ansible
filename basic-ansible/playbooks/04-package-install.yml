@@ -1,0 +1,42 @@
+---
+# ==========================================
+# 04-package-install.yml - Install Software Packages
+# ==========================================
+# Run command:
+#   ansible-playbook playbooks/04-package-install.yml
+
+- name: Install Common Packages
+  hosts: all
+  become: true
+
+  tasks:
+    - name: (Ubuntu/Debian) Update apt cache and install packages
+      ansible.builtin.apt:
+        name:
+          - curl
+          - wget
+          - git
+          - tree
+          - htop
+        state: present
+        update_cache: true
+      when: ansible_os_family == "Debian"
+
+    - name: (RedHat/CentOS/Amazon Linux) Install packages
+      ansible.builtin.yum:
+        name:
+          - curl
+          - wget
+          - git
+          - htop
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: Verify Git installation
+      ansible.builtin.command: git --version
+      register: git_version
+      changed_when: false
+
+    - name: Print Git version
+      ansible.builtin.debug:
+        msg: "Git is installed: {{ git_version.stdout }}"

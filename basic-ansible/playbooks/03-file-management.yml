@@ -1,0 +1,41 @@
+---
+# ==========================================
+# 03-file-management.yml - Files & Folders
+# ==========================================
+# Run command:
+#   ansible-playbook playbooks/03-file-management.yml
+
+- name: Basic File and Directory Management
+  hosts: all
+  become: true # Run tasks with sudo permissions
+
+  tasks:
+    - name: Create a demo directory
+      ansible.builtin.file:
+        path: /tmp/ansible-demo
+        state: directory
+        mode: '0755'
+
+    - name: Create a text file directly with content
+      ansible.builtin.copy:
+        dest: /tmp/ansible-demo/created-by-ansible.txt
+        content: |
+          Hello! This file was written by Ansible.
+          Host: {{ inventory_hostname }}
+          Date: {{ ansible_date_time.date | default('N/A') }}
+        mode: '0644'
+
+    - name: Copy a local file to the remote server
+      ansible.builtin.copy:
+        src: ../files/sample.txt
+        dest: /tmp/ansible-demo/sample.txt
+        mode: '0644'
+
+    - name: Verify file exists
+      ansible.builtin.stat:
+        path: /tmp/ansible-demo/sample.txt
+      register: file_check
+
+    - name: Print file status
+      ansible.builtin.debug:
+        msg: "File exists: {{ file_check.stat.exists }}, size: {{ file_check.stat.size }} bytes"

@@ -1,0 +1,3 @@
+Hello from Ansible!
+This file was copied automatically using the ansible.builtin.copy module.
+Timestamp: Managed by Ansible

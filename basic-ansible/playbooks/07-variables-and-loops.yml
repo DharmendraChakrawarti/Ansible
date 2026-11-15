@@ -1,0 +1,45 @@
+---
+# ==========================================
+# 07-variables-and-loops.yml - Variables, Loops & Conditionals
+# ==========================================
+# Run command:
+#   ansible-playbook playbooks/07-variables-and-loops.yml
+
+- name: Learn Variables, Loops and Conditionals
+  hosts: all
+  gather_facts: true
+
+  # 1. Define Playbook Variables
+  vars:
+    app_name: "SuperApp"
+    environment_name: "Development"
+    target_directories:
+      - /tmp/app-logs
+      - /tmp/app-data
+      - /tmp/app-backups
+    tools_list:
+      - git
+      - curl
+      - htop
+
+  tasks:
+    - name: Display simple variable
+      ansible.builtin.debug:
+        msg: "Deploying {{ app_name }} into {{ environment_name }} environment"
+
+    - name: Loop through a list to create multiple folders
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop: "{{ target_directories }}"
+
+    - name: Use conditionals (when condition)
+      ansible.builtin.debug:
+        msg: "This server is running on Debian/Ubuntu!"
+      when: ansible_os_family == "Debian"
+
+    - name: Conditional for RedHat family
+      ansible.builtin.debug:
+        msg: "This server is running on RedHat / CentOS / Amazon Linux!"
+      when: ansible_os_family == "RedHat"

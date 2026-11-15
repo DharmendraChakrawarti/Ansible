@@ -1,0 +1,20 @@
+---
+# ==========================================
+# 01-ping.yml - Test connectivity to hosts
+# ==========================================
+# Run command:
+#   ansible-playbook playbooks/01-ping.yml
+# Or run on localhost only:
+#   ansible-playbook playbooks/01-ping.yml -i "localhost," -c local
+
+- name: Basic Connectivity Check
+  hosts: all
+  gather_facts: false # Set to false to make it fast without gathering system details
+
+  tasks:
+    - name: Ping target hosts
+      ansible.builtin.ping:
+
+    - name: Print welcome message
+      ansible.builtin.debug:
+        msg: "Connected successfully to {{ inventory_hostname }}!"

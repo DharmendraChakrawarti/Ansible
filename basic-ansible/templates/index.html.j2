@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome to {{ server_name | default('My Ansible Server') }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f4f9; }
+        .card { background: white; padding: 30px; border-radius: 10px; display: inline-block; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1 { color: #0275d8; }
+        p { color: #555; }
+        .badge { background: #5cb85c; color: white; padding: 5px 10px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🚀 Deployed with Ansible!</h1>
+        <p>Host Name: <strong>{{ ansible_hostname }}</strong></p>
+        <p>OS Distribution: <strong>{{ ansible_distribution }} {{ ansible_distribution_version }}</strong></p>
+        <p>IP Address: <strong>{{ ansible_default_ipv4.address | default('N/A') }}</strong></p>
+        <p><span class="badge">Status: Running</span></p>
+    </div>
+</body>
+</html>

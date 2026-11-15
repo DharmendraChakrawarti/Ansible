@@ -1,0 +1,55 @@
+---
+# ==========================================
+# 09-simple-webserver.yml - Deploy Nginx Web Server
+# ==========================================
+# Installs Nginx, deploys dynamic HTML page, and starts service
+# Run command:
+#   ansible-playbook playbooks/09-simple-webserver.yml
+
+- name: Deploy Simple Nginx Web Server
+  hosts: all
+  become: true
+  gather_facts: true
+
+  vars:
+    server_name: "My First Ansible Web Server"
+    web_root: "/var/www/html"
+
+  tasks:
+    - name: (Ubuntu/Debian) Install Nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+        update_cache: true
+      when: ansible_os_family == "Debian"
+
+    - name: (RedHat/Amazon Linux) Install Nginx
+      ansible.builtin.yum:
+        name: nginx
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: Ensure web directory exists
+      ansible.builtin.file:
+        path: "{{ web_root }}"
+        state: directory
+        mode: '0755'
+
+    - name: Deploy custom web page from Jinja2 template
+      ansible.builtin.template:
+        src: ../templates/index.html.j2
+        dest: "{{ web_root }}/index.html"
+        mode: '0644'
+      notify: Restart Nginx Service
+
+    - name: Start and enable Nginx service
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
+
+  handlers:
+    - name: Restart Nginx Service
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
