@@ -8,9 +8,7 @@
     mode: "0644"
 
 - name: (Amazon) Import Jenkins GPG key
-  ansible.builtin.rpm_key:
-    key: https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
-    state: present
+  ansible.builtin.command: rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
 
 - name: (Amazon) Install Jenkins
   ansible.builtin.yum:

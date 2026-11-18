@@ -18,7 +18,6 @@
 - name: Install prerequisite packages (RedHat-based)
   ansible.builtin.yum:
     name:
-      - curl
       - unzip
     state: present
   when: ansible_os_family == "RedHat"

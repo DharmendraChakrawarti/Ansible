@@ -1,24 +1,27 @@
 ---
-# Install Java (prerequisite for Jenkins) - handles all OS families
+# Install Java 21 (required by modern Jenkins) - handles all OS families
 
-- name: (Ubuntu) Install OpenJDK 17
+- name: (Ubuntu) Install OpenJDK 21
   ansible.builtin.apt:
-    name: openjdk-17-jdk
+    name: openjdk-21-jdk
     state: present
-    update_cache: true
   when: ansible_distribution == "Ubuntu"
 
-- name: (Amazon/RedHat) Install OpenJDK 17
+- name: (Amazon) Install OpenJDK 21 Corretto
   ansible.builtin.yum:
-    name: java-17-amazon-corretto-devel
+    name: java-21-amazon-corretto-devel
     state: present
   when: ansible_distribution == "Amazon"
 
-- name: (RedHat) Install OpenJDK 17
+- name: (RedHat) Install OpenJDK 21
   ansible.builtin.dnf:
-    name: java-17-openjdk-devel
+    name: java-21-openjdk-devel
     state: present
   when: ansible_os_family == "RedHat" and ansible_distribution != "Amazon"
+
+- name: (Amazon) Configure default Java alternative to Java 21
+  ansible.builtin.shell: alternatives --set java $(alternatives --display java | grep -o '/usr/lib/jvm/java-21-amazon-corretto[^ ]*' | head -n1)/bin/java || true
+  when: ansible_distribution == "Amazon"
 
 - name: Verify Java installation
   ansible.builtin.command: java -version

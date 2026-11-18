@@ -1,17 +1,10 @@
 ---
 # Docker installation tasks for Amazon Linux
 
-- name: (Amazon) Remove old Docker packages
-  ansible.builtin.yum:
-    name:
-      - docker
-    state: absent
-
 - name: (Amazon) Install prerequisite packages
   ansible.builtin.yum:
     name:
       - yum-utils
-      - curl
       - unzip
     state: present
 

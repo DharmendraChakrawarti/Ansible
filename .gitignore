@@ -1,0 +1,10 @@
+# Ansible logs and retry files
+*.log
+*.retry
+.ansible/
+__pycache__/
+*.pyc
+
+# OS generated
+.DS_Store
+Thumbs.db
